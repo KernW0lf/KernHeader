@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys
 import requests
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QProgressBar, QMessageBox
 from PyQt5.QtGui import QFont, QIcon, QPixmap
 from PyQt5.QtCore import Qt, QUrl
 from PyQt5.QtGui import QGuiApplication
@@ -51,6 +51,11 @@ class FileDownloader(QWidget):
         self.webview.setFixedSize(window_width, window_height-100)
         self.webview.hide()  
 
+        self.progress_bar = QProgressBar()
+        self.progress_bar.setRange(0, 0)  
+        self.progress_bar.setTextVisible(True)  
+        self.progress_bar.setVisible(False)  
+
         hbox = QHBoxLayout()
         hbox.addWidget(self.file_label)
         hbox.addWidget(self.file_input)
@@ -60,6 +65,7 @@ class FileDownloader(QWidget):
         layout.addWidget(banner_label)  
         layout.addLayout(hbox)  
         layout.addWidget(self.output_label)
+        layout.addWidget(self.progress_bar) 
         layout.addWidget(self.webview)
 
         self.setLayout(layout)
@@ -70,23 +76,41 @@ class FileDownloader(QWidget):
         url = f'https://raw.githubusercontent.com/torvalds/linux/master/include/linux/{file_name}'
 
         try:
-            response = requests.get(url)
-            if response.status_code == 200:
-                with open(f'/tmp/{file_name}', 'wb') as f:
-                    f.write(response.content)
+            response = requests.get(url, stream=True)
+            if response.status_code != 200:
+                error_message = "Error: File name incorrect or not found."
+                self.show_warning_message(error_message)
+                return
 
-                out_file = f"/tmp/{file_name}.html"
-                subprocess.run(['pygmentize', '-o', out_file, '-f', 'html', '-O', 'full,style=dracula', f'/tmp/{file_name}'])
-                self.output_label.setText(f"File downloaded and saved to:\n/tmp/{file_name}")
+            total_size = int(response.headers.get('content-length', 0))
+            block_size = 1024 
+            self.progress_bar.setMaximum(total_size // block_size)
+            self.progress_bar.setVisible(True)  
 
+            with open(f'/tmp/{file_name}', 'wb') as f:
+                for data in response.iter_content(block_size):
+                    f.write(data)
+                    self.progress_bar.setValue(self.progress_bar.value() + 1)
 
-                self.webview.setUrl(QUrl.fromLocalFile(out_file))
-                self.webview.show()  
-            else:
-                self.output_label.setStyleSheet("color: #333; font-size: 20px;") 
-                self.output_label.setText("File not found. Please enter a valid file name.")
+            out_file = f"/tmp/{file_name}.html"
+            subprocess.run(['pygmentize', '-o', out_file, '-f', 'html', '-O', 'full,style=dracula', f'/tmp/{file_name}'])
+            self.output_label.setText(f"File downloaded and saved to:\n/tmp/{file_name}")
+
+            self.webview.setUrl(QUrl.fromLocalFile(out_file))
+            self.webview.show()
         except Exception as e:
-            self.output_label.setText(f"An error occurred: {str(e)}")
+            error_message = f"An error occurred: {str(e)}"
+            self.show_warning_message(error_message)
+        finally:
+            self.progress_bar.setVisible(False)  
+
+    def show_warning_message(self, message):
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Warning)
+        msg.setWindowTitle("Warning")
+        msg.setText(message)
+        msg.setFont(QFont("Arial", 10, QFont.Bold))
+        msg.exec_()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
