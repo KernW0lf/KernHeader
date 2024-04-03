@@ -63,6 +63,7 @@ class FileDownloader(QWidget):
         layout.addWidget(self.webview)
 
         self.setLayout(layout)
+        self.file_input.returnPressed.connect(self.download_button.click)
 
     def download_and_convert(self):
         file_name = self.file_input.text().strip()
