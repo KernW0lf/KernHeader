@@ -44,6 +44,16 @@ python kernheader.py
 
 ### 5. If the file is not found, an error message will be displayed.
 
+
+
+## [Releases](https://github.com/KernW0lf/KernHeader/releases/tag/v1.0.0)
+To use KernHeader, simply run the executable `kernheader`. 
+
+```bash
+./kernheader
+```
+
+
 ## Contributing
 
 Contributions are welcome! If you'd like to contribute to KernHeader, please fork the repository and create a pull request with your changes.
