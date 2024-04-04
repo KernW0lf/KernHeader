@@ -6,7 +6,6 @@ from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtCore import Qt, QUrl
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 import subprocess
-import pyfiglet
 
 class FileDownloader(QWidget):
     def __init__(self):
@@ -14,8 +13,7 @@ class FileDownloader(QWidget):
         self.init_ui()
 
     def init_ui(self):
-        custom_fig = pyfiglet.Figlet(font='mnemonic')
-        banner_text = custom_fig.renderText("kernw0lf")
+        banner_text = "kernw0lf"
         banner_label = QLabel(banner_text)
         banner_label.setAlignment(Qt.AlignCenter)
         banner_label.setStyleSheet("color: #007BFF; font-size: 34px;")
