@@ -23,6 +23,8 @@ If you face any error related to PyQt5-QTWebEngine, use the following commands:
 
 ```bash
 pip uninstall PyQt5 PyQt5-tools PyQt5-sip
+pip install PyQt5
+pip install PyQtWebEngine
 sudo apt-get install python3-pyqt5 python3-pyqt5.qtwebengine
 ```
 
