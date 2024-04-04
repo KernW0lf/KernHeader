@@ -34,7 +34,7 @@ sudo apt-get install python3-pyqt5 python3-pyqt5.qtwebengine
 python kernheader.py
 ```
 
-### 2. Enter the name of the Linux kernel header file you want to download in the input field.
+### 2. Enter the name of the Linux kernel header file (eg. module.h) you want to download in the input field.
 
 ### 3. Click on the "Download and Display" button.
 
